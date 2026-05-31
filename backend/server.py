@@ -25926,12 +25926,14 @@ async def client_request_module_changes(
     dev_id = module.get("assigned_to")
     if dev_id:
         try:
+            _lg_rr = await _resolve_user_lang(dev_id)
+            _mod_t = module.get("title", "Module")
             await db.notifications.insert_one({
                 "notification_id": f"ntf_{uuid.uuid4().hex[:12]}",
                 "user_id":   dev_id,
                 "type":      "revision_requested",
-                "title":     f"Changes requested: {module.get('title', 'Module')}",
-                "body":      feedback[:200],
+                "title":     _i18n_t("notif.revision_requested.title", _lg_rr, module=_mod_t),
+                "body":      _i18n_t("notif.revision_requested.body",  _lg_rr, feedback=feedback[:200]),
                 "module_id": module_id,
                 "read":      False,
                 "created_at": now_iso,

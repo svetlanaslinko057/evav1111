@@ -128,16 +128,31 @@ def init_router(db, get_current_user_dep):
                     "approved_by": user.user_id,
                     "created_at": _now_iso(),
                 })
-            await _emit_notification(
-                db,
-                user_id=assignee,
-                type_="module_done",
-                severity="success",
-                title=(f"You earned ${dev_share:.0f}" if dev_share > 0 else "Module shipped"),
-                subtitle=f"{module.get('title') or 'Module'} approved by client",
-                project_id=module.get("project_id"),
-                module_id=module_id,
-            )
+            _mod_title = module.get("title") or "Module"
+            if dev_share > 0:
+                await _emit_notification(
+                    db,
+                    user_id=assignee,
+                    type_="module_done",
+                    severity="success",
+                    project_id=module.get("project_id"),
+                    module_id=module_id,
+                    i18n_key_title="notif.module_done_earn.title",
+                    i18n_key_body="notif.module_done_earn.body",
+                    i18n_fmt={"amount": f"{dev_share:.0f}", "module": _mod_title},
+                )
+            else:
+                await _emit_notification(
+                    db,
+                    user_id=assignee,
+                    type_="module_done",
+                    severity="success",
+                    project_id=module.get("project_id"),
+                    module_id=module_id,
+                    i18n_key_title="notif.module_done_ship.title",
+                    i18n_key_body="notif.module_done_ship.body",
+                    i18n_fmt={"module": _mod_title},
+                )
 
         # Client-visible audit row so admins see who approved what from the UI.
         await db.auto_actions.insert_one({
@@ -180,15 +195,17 @@ def init_router(db, get_current_user_dep):
         assignee = module.get("assigned_to")
         if assignee:
             reason = (body.reason or "Client requested changes").strip()[:280]
+            _mod_title = module.get("title") or "Module"
             await _emit_notification(
                 db,
                 user_id=assignee,
                 type_="revision_requested",
                 severity="warning",
-                title="Changes requested",
-                subtitle=f"{module.get('title') or 'Module'} — {reason}",
                 project_id=module.get("project_id"),
                 module_id=module_id,
+                i18n_key_title="notif.revision_requested.title",
+                i18n_key_body="notif.revision_requested.body",
+                i18n_fmt={"module": _mod_title, "feedback": f"{_mod_title} — {reason}"},
             )
 
         await db.auto_actions.insert_one({
