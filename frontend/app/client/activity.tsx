@@ -240,7 +240,7 @@ export default function ClientActivity() {
       >
         {/* ─── HEADER + PROJECT SELECTOR ─── */}
         <View style={s.headerRow}>
-          <Text style={s.h1}>Activity</Text>
+          <Text style={s.h1} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Activity</Text>
           {showPicker ? (
             <TouchableOpacity
               testID="activity-project-picker"
@@ -687,14 +687,15 @@ const s = StyleSheet.create({
 
   /* Header */
   headerRow:    { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: T.lg, gap: 12 },
-  h1:           { color: T.text, fontSize: T.h1, fontWeight: '800', letterSpacing: -0.5 },
+  h1:           { color: T.text, fontSize: T.h1, fontWeight: '800', letterSpacing: -0.5, flexShrink: 1, minWidth: 0 },
   projectPill:  {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 10, paddingVertical: 6,
     backgroundColor: T.surface2,
     borderRadius: T.radiusSm,
     borderWidth: 1, borderColor: T.border,
-    maxWidth: 200,
+    maxWidth: 180,
+    flexShrink: 0,
   },
   projectPillText: { color: T.textSecondary, fontSize: 12, fontWeight: '600' },
   projectStatic:   { color: T.textMuted, fontSize: 12, fontWeight: '500', maxWidth: 200 },
